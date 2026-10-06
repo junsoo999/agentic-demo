@@ -42,7 +42,7 @@ Start `opencode` in the repository root and enter:
 memfit을 완성해줘.
 ```
 
-The agent implements the four functions in `src/memfit/capacity.py` from the formulas in `AGENTS.md`, writes tests S2-S7 in `tests/test_capacity.py` following the given S1 example, runs `pytest`, and runs `memfit --device accel-48g` to report the result.
+The agent implements the four functions in `src/memfit/capacity.py` from the formulas in `AGENTS.md`, writes tests S2-S7 in `tests/test_capacity.py` following the given S1 example, runs `pytest`, and runs `memfit --device bertha-500-mp` to report the result.
 
 Reset to the starting state for the next run:
 
@@ -59,4 +59,4 @@ git restore src tests
 | Max concurrent requests | `(device_memory - weights) // kv_cache_per_request`, or 0 when the weights do not fit |
 | Max context length for N requests | `(device_memory - weights) // (N * kv_cache_per_token)`, or 0 when the weights do not fit |
 
-Devices in `src/memfit/catalog.py` are illustrative memory sizes, not real product specifications.
+Devices in `src/memfit/catalog.py`: `bertha-500-es` (128 GiB) and `bertha-500-mp` (192 GiB).

@@ -38,7 +38,8 @@ contain the formulas or the solution. Change these together.
 - Capacity functions are pure and use integer math only (`//`). GiB conversion for display lives in `cli.py`.
 - Tests: one function per scenario, `test_s<N>_<what>`, expected values copied from the table. S1 ships finished
   as the pattern the demo agent copies; `import pytest` is there for the `ValueError` scenario.
-- Devices in `src/memfit/catalog.py` are illustrative memory sizes, not real product specs.
+- Devices in `src/memfit/catalog.py`: `bertha-500-es` (128 GiB) and `bertha-500-mp` (192 GiB). Keep names and
+  sizes in step with the real products.
 
 ## Verifying a change without spoiling the demo
 

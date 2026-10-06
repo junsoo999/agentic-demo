@@ -20,7 +20,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="memfit",
         description="Show which models fit on a device and how many concurrent requests each can serve.",
     )
-    parser.add_argument("-d", "--device", choices=sorted(DEVICES), default="accel-24g", help="target device")
+    parser.add_argument("-d", "--device", choices=sorted(DEVICES), default="bertha-500-es", help="target device")
     parser.add_argument("-c", "--context", type=int, default=8192, help="context length per request, in tokens")
     parser.add_argument("-n", "--requests", type=int, default=16, help="concurrent requests for the max-context column")
     parser.add_argument("-m", "--model", choices=sorted(MODELS), help="show a single model (default: all)")

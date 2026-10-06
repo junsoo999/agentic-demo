@@ -53,7 +53,7 @@ When the user asks you to complete `memfit`, do these steps in order without sto
    the request count and the context length):
 
    ```bash
-   uv run --no-sync memfit --device accel-48g
+   uv run --no-sync memfit --device bertha-500-mp
    ```
 
 ## Rules

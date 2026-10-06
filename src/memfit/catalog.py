@@ -1,7 +1,7 @@
 """Built-in model and device catalog used by the CLI.
 
-Model numbers are the publicly documented architecture values. Devices are illustrative
-memory sizes, not real product specifications.
+Model numbers are the publicly documented architecture values. Devices list the HBM
+capacity of each accelerator in GiB.
 """
 
 from memfit.capacity import DeviceSpec, ModelSpec
@@ -19,8 +19,7 @@ MODELS: dict[str, ModelSpec] = {
 DEVICES: dict[str, DeviceSpec] = {
     spec.name: spec
     for spec in (
-        DeviceSpec("accel-24g", memory_gib=24),
-        DeviceSpec("accel-48g", memory_gib=48),
-        DeviceSpec("accel-80g", memory_gib=80),
+        DeviceSpec("bertha-500-es", memory_gib=128),
+        DeviceSpec("bertha-500-mp", memory_gib=192),
     )
 }
