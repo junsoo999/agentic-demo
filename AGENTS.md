@@ -1,64 +1,63 @@
 # memfit agent guide
 
-`memfit` answers one question for an AI accelerator: **does this LLM fit in device memory, and how many
-concurrent requests can it serve?**
+`memfit` answers one question: **does this LLM fit in device memory, and how many concurrent requests
+can it serve?**
 
-## Files
+Two files are unfinished. Everything else is done; do not read or edit it.
 
-| Path | Status | What to do |
-|---|---|---|
-| `src/memfit/capacity.py` | TODO | Implement the 3 functions marked `# TODO: implement` |
-| `tests/test_capacity.py` | TODO | Implement test scenarios S1-S6 listed in the module docstring |
-| `src/memfit/catalog.py` | Done | Do not edit, no need to read |
-| `src/memfit/cli.py` | Done | Do not edit, no need to read |
+| Path | What to do |
+|---|---|
+| `src/memfit/capacity.py` | Fill in the 4 function bodies marked `# TODO: implement`, using the formulas below |
+| `tests/test_capacity.py` | Write tests S2-S7 in the same style as the given `test_s1_weight_bytes_fp16` |
 
-## Workflow
+## Formulas
 
-When the user asks you to implement or complete `memfit`, do these four steps in order.
-Do not stop or ask for confirmation between steps.
+Use these names exactly as they appear in `src/memfit/capacity.py`. Integer math only: `//`, never `/`.
 
-1. **Plan.** Read `src/memfit/capacity.py` and `tests/test_capacity.py`, and nothing else.
-   Then tell the user your plan in at most 5 short bullets.
-2. **Implement.** Replace the three `raise NotImplementedError` bodies in `src/memfit/capacity.py`.
-   The exact formula for each function is in its docstring. Follow it literally.
-   Write code that already satisfies the lint rules below.
-3. **Test.** In `tests/test_capacity.py`, write one test function per scenario (S1-S6) with the exact
-   values from the table. Then run lint and tests together with this single command:
+```text
+weight_bytes(model, quant):
+    if quant is not a key of WEIGHT_BITS: raise ValueError(quant)
+    return model.num_params * WEIGHT_BITS[quant] // 8
+
+kv_cache_bytes_per_request(model, context_len):
+    return 2 * model.num_layers * model.num_kv_heads * model.head_dim * context_len * KV_BYTES_PER_ELEMENT
+
+max_concurrent_requests(model, device, quant, context_len):
+    free = device.memory_gib * GIB - weight_bytes(model, quant)
+    if free < 0: return 0
+    return free // kv_cache_bytes_per_request(model, context_len)
+
+max_context_len(model, device, quant, num_requests):
+    free = device.memory_gib * GIB - weight_bytes(model, quant)
+    if free < 0: return 0
+    kv_per_token = kv_cache_bytes_per_request(model, 1)
+    return free // (num_requests * kv_per_token)
+```
+
+## Steps
+
+When the user asks you to complete `memfit`, do these steps in order without stopping to ask.
+
+1. Read `src/memfit/capacity.py` and `tests/test_capacity.py`. Nothing else.
+2. In `src/memfit/capacity.py`, replace each `raise NotImplementedError` with the matching formula above,
+   written as Python. Keep the docstrings.
+3. In `tests/test_capacity.py`, write one test function per row S2-S7, named `test_s<N>_...`, each with a
+   single `assert` on the exact `Expected` value. For S3 use `with pytest.raises(ValueError):`.
+4. Run the tests. They must report `7 passed`. If one fails, fix the function body, never the expected value.
 
    ```bash
-   uv run --no-sync ruff format . && uv run --no-sync ruff check . && uv run --no-sync pytest
+   uv run --no-sync pytest
    ```
 
-   Ruff must report `All checks passed!` and all 6 tests must pass.
-   If Ruff reports an error, fix the code it points at. If a test fails, fix the implementation.
-   Never change the expected values.
-4. **Demo.** Run the real program:
+5. Run the program and summarize the table in 2-3 sentences (which models fit, how quantization changes
+   the request count and the context length):
 
    ```bash
    uv run --no-sync memfit --device accel-48g
    ```
 
-   Then summarize the table in 2-3 sentences: which models fit, and how quantization changes the
-   maximum number of concurrent requests.
-
-## Lint rules (enforced by Ruff)
-
-Keep these in mind while writing code, so the check passes on the first run:
-
-- Lines are at most 119 characters. Indent with 4 spaces. Use double quotes.
-- Names: `snake_case` for functions and variables, `UPPER_SNAKE_CASE` for constants.
-- No `print()`, no unused imports, no unused variables.
-- Keep every existing docstring exactly as it is. Put your code below the docstring.
-- Add type hints to test functions: `def test_s1_weight_bytes_fp16() -> None:`.
-- Do not add `# noqa` comments or edit `pyproject.toml` to silence an error. Fix the code instead.
-
 ## Rules
 
-- Run everything through `uv run --no-sync ...`. Never use `pip`, bare `python`, bare `pytest`,
-  `uv sync`, or `uv add`.
-- Standard library only. Do not add dependencies or create new files.
-- Do not change function signatures, constants, dataclasses, or docstrings.
-- Integer math only: use `//`, never `/`, `round()`, or floats.
-- Keep it minimal: no extra features, no refactoring, no tests beyond S1-S6.
-- Do not run `git` or `pre-commit`.
-- Write code and comments in English. Talk to the user in Korean.
+- Always use `uv run --no-sync ...`. Never use `pip`, bare `python`, bare `pytest`, `uv sync`, or `uv add`.
+- Do not change signatures, constants, dataclasses, or docstrings. Do not create files or add dependencies.
+- Code in English. Talk to the user in Korean.

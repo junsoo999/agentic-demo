@@ -1,25 +1,21 @@
 """Memory capacity math for serving an LLM on an accelerator.
 
-Device memory is split into two parts:
-
-- Model weights, loaded once and shared by every request.
-- KV cache, allocated separately for each concurrent request.
-
-All functions return exact integers (bytes or request counts). Use integer math only.
+Device memory holds the model weights once, plus one KV cache per concurrent request.
+All functions return exact integers. Use integer math only (``//``, never ``/``).
 """
 
 from dataclasses import dataclass
 
 GIB = 1024**3
 
-# Bits used to store one weight parameter, per quantization scheme.
+# Bits per weight parameter, by quantization scheme.
 WEIGHT_BITS = {"fp16": 16, "int8": 8, "int4": 4}
 
-# The KV cache is always stored as fp16: 2 bytes per element.
+# The KV cache is stored as fp16: 2 bytes per element.
 KV_BYTES_PER_ELEMENT = 2
 
 
-@dataclass(frozen=True)
+@dataclass
 class ModelSpec:
     """Architecture numbers needed to estimate a model's memory use."""
 
@@ -30,7 +26,7 @@ class ModelSpec:
     head_dim: int
 
 
-@dataclass(frozen=True)
+@dataclass
 class DeviceSpec:
     """An accelerator and its memory size in GiB."""
 
@@ -41,18 +37,7 @@ class DeviceSpec:
 def weight_bytes(model: ModelSpec, quant: str) -> int:
     """Return the memory used by the model weights, in bytes.
 
-    Formula:
-        model.num_params * WEIGHT_BITS[quant] // 8
-
-    Args:
-        model: The model to size.
-        quant: Quantization scheme, one of the keys of ``WEIGHT_BITS``.
-
-    Returns:
-        Weight memory in bytes.
-
-    Raises:
-        ValueError: When ``quant`` is not a key of ``WEIGHT_BITS``.
+    Raises ``ValueError`` when ``quant`` is not a key of ``WEIGHT_BITS``.
     """
     # TODO: implement
     raise NotImplementedError
@@ -61,17 +46,7 @@ def weight_bytes(model: ModelSpec, quant: str) -> int:
 def kv_cache_bytes_per_request(model: ModelSpec, context_len: int) -> int:
     """Return the KV cache memory one request needs, in bytes.
 
-    Each layer stores a key tensor and a value tensor (hence the factor 2).
-
-    Formula:
-        2 * model.num_layers * model.num_kv_heads * model.head_dim * context_len * KV_BYTES_PER_ELEMENT
-
-    Args:
-        model: The model to size.
-        context_len: Context length in tokens reserved for each request.
-
-    Returns:
-        KV cache memory for a single request, in bytes.
+    Each layer stores a key tensor and a value tensor for every token of the context.
     """
     # TODO: implement
     raise NotImplementedError
@@ -80,19 +55,16 @@ def kv_cache_bytes_per_request(model: ModelSpec, context_len: int) -> int:
 def max_concurrent_requests(model: ModelSpec, device: DeviceSpec, quant: str, context_len: int) -> int:
     """Return how many requests the device can serve at the same time.
 
-    Formula:
-        free = device.memory_gib * GIB - weight_bytes(model, quant)
-        if free < 0: the weights do not fit, return 0
-        otherwise:   return free // kv_cache_bytes_per_request(model, context_len)
+    Returns 0 when the weights alone do not fit in device memory.
+    """
+    # TODO: implement
+    raise NotImplementedError
 
-    Args:
-        model: The model to serve.
-        device: The accelerator to serve it on.
-        quant: Quantization scheme for the weights.
-        context_len: Context length in tokens reserved for each request.
 
-    Returns:
-        Maximum number of concurrent requests, or 0 when the weights do not fit.
+def max_context_len(model: ModelSpec, device: DeviceSpec, quant: str, num_requests: int) -> int:
+    """Return the largest context length per request that still allows ``num_requests`` at the same time.
+
+    Returns 0 when the weights alone do not fit in device memory.
     """
     # TODO: implement
     raise NotImplementedError
