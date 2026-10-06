@@ -28,7 +28,6 @@ One-time setup:
 
 ```bash
 uv sync
-uv run --no-sync pre-commit install
 ```
 
 Before the demo, show the starting state (the program fails with `NotImplementedError`):
@@ -43,9 +42,9 @@ Start `opencode` in the repository root and enter:
 memfit을 완성해줘.
 ```
 
-The agent then follows the four steps in `AGENTS.md`: plan, implement `src/memfit/capacity.py`, write the six test scenarios in `tests/test_capacity.py` and pass Ruff and pytest, and run `memfit --device accel-48g` to report the result.
+The agent implements the four functions in `src/memfit/capacity.py` from the formulas in `AGENTS.md`, writes tests S2-S7 in `tests/test_capacity.py` following the given S1 example, runs `pytest`, and runs `memfit --device accel-48g` to report the result.
 
-Reset to the starting state for the next run (requires the template to be committed):
+Reset to the starting state for the next run:
 
 ```bash
 git restore src tests
@@ -55,8 +54,9 @@ git restore src tests
 
 | Quantity | Formula |
 |---|---|
-| Weights | `num_params * bits / 8` (fp16 = 16, int8 = 8, int4 = 4) |
+| Weights | `num_params * bits // 8` (fp16 = 16, int8 = 8, int4 = 4) |
 | KV cache per request | `2 * num_layers * num_kv_heads * head_dim * context_len * 2 bytes` |
-| Max concurrent requests | `(device_memory - weights) // kv_cache_per_request` |
+| Max concurrent requests | `(device_memory - weights) // kv_cache_per_request`, or 0 when the weights do not fit |
+| Max context length for N requests | `(device_memory - weights) // (N * kv_cache_per_token)`, or 0 when the weights do not fit |
 
 Devices in `src/memfit/catalog.py` are illustrative memory sizes, not real product specifications.
