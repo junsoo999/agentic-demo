@@ -1,0 +1,21 @@
+[project]
+name = "memfit"
+version = "0.1.0"
+description = "Estimate whether an LLM fits in accelerator memory and how many concurrent requests it can serve."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+memfit = "memfit.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["uv_build>=0.11.19,<0.12"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
