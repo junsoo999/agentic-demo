@@ -12,11 +12,13 @@ Copyright 2026 The HyperAccel. All rights reserved.
     <br>
 </p>
 
-<h1 align="center">memfit</h1>
+<h1 align="center">memfit: LLM Memory Capacity Calculator for HyperAccel Bertha</h1>
+
+<h3 align="center">An Agentic Coding Demo with opencode</h3>
 
 <p align="center">
 <b>Does this LLM fit in device memory, and how many concurrent requests can it serve?</b><br>
-A live coding-agent demo for HyperAccel Bertha devices.
+A coding agent answers that question live by finishing this small CLI in about a minute.
 </p>
 
 ---
