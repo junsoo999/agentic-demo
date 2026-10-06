@@ -1,0 +1,52 @@
+[project]
+name = "memfit"
+version = "0.1.0"
+description = "Estimate whether an LLM fits in accelerator memory and how many concurrent requests it can serve."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+memfit = "memfit.cli:main"
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.0",
+    "pytest>=8.0",
+    "ruff>=0.14",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.19,<0.12"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 119
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "D",   # pydocstyle (Google convention)
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "T20", # flake8-print
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+# The test skeleton ships with imports the agent will use; keep `ruff --fix` from stripping them.
+# Test names are self-documenting, so docstrings are not required.
+"tests/**" = ["F401", "D"]
+# The CLI is the only place allowed to print.
+"src/memfit/cli.py" = ["T20"]
