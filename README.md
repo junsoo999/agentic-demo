@@ -12,13 +12,16 @@ Copyright 2026 The HyperAccel. All rights reserved.
     <br>
 </p>
 
-<h3 align="center">
-Agentic Demo
-</h3>
+<h1 align="center">memfit</h1>
+
+<p align="center">
+<b>Does this LLM fit in device memory, and how many concurrent requests can it serve?</b><br>
+A live coding-agent demo for HyperAccel Bertha devices.
+</p>
 
 ---
 
-`memfit` answers one question for an AI accelerator: **does this LLM fit in device memory, and how many concurrent requests can it serve?**
+`memfit` is a small CLI that sizes an LLM against an accelerator's memory: weights once, plus one KV cache per concurrent request.
 
 This repository is a demo template. The capacity math and its tests are intentionally left unimplemented so a coding agent ([opencode](https://opencode.ai)) can finish them live, guided by [`AGENTS.md`](AGENTS.md).
 
